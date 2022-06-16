@@ -4,30 +4,23 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/LCRERGO/LALang/pkg/errors"
 	grammar "github.com/LCRERGO/LALang/pkg/grammar/antlr"
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 )
 
-/*
- * The main runner of the task
- */
-
-func main() {
-	// TODO: alter for len < 3
-	if len(os.Args) < 2 {
-		fmt.Printf("Usage: %s <input>\n", os.Args[0])
+// Recognizes each token in a specific way and writes them to out file
+func LexerTreatment(lex *grammar.LA, outFile *os.File) {
+	// A defered routine to panic at errors and stop parsing symbols
+	defer func(outFile *os.File) {
+		if err := recover(); err != nil {
+			// Type casting a inteface{} into an error
+			outFile.WriteString(fmt.Errorf("%v", err).Error())
+		}
 		os.Exit(1)
-	}
-	cs, err := antlr.NewFileStream(os.Args[1])
-	if err != nil {
-		os.Exit(1)
-	}
-	lex := grammar.NewLA(cs)
-	//outFile := os.OpenFile(os.Args[2], os.O_RDWR, 0766)
-
+	}(outFile)
 	for t := lex.NextToken(); t.GetTokenType() != antlr.TokenEOF; t = lex.NextToken() {
 		var outstr string
-		//errDispach := lex.GetErrorListenerDispatch()
 		tokenType := t.GetTokenType()
 
 		switch tokenType {
@@ -52,7 +45,38 @@ func main() {
 			// return output string on format <'match','token'> e.g.:
 			outstr = fmt.Sprintf("<'%s','%s'>\n", t.GetText(), lex.SymbolicNames[t.GetTokenType()])
 		}
-		print(outstr)
+		outFile.WriteString(outstr)
+	}
+}
+
+/*
+ * The main runner of the task
+ */
+func main() {
+	if len(os.Args) < 3 {
+		fmt.Printf("Usage: %s <input> <output>\n", os.Args[0])
+		os.Exit(1)
+	}
+	inFname, outFname := os.Args[1], os.Args[2]
+
+	// Opens input an output files
+	cs, err := antlr.NewFileStream(inFname)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	outFile, err := os.OpenFile(outFname, os.O_CREATE|os.O_RDWR, 0766)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
 	}
 
+	// Creating a nil lexer
+	lex := grammar.NewLA(cs)
+	// Enabling Custom Error Handling
+	lexerErrors := errors.NewLAErrorListener()
+	lex.RemoveErrorListeners()
+	lex.AddErrorListener(lexerErrors)
+
+	LexerTreatment(lex, outFile)
 }
