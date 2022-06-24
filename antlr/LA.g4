@@ -14,12 +14,16 @@ PALAVRA_CHAVE: 'algoritmo' | 'declare' | 'literal' | 'inteiro' | 'fim_algoritmo'
 
 NUM_INT: [0-9]+;
 NUM_REAL: [0-9]+ '.' [0-9]+;
-IDENT: ([a-z] | [A-Z])([a-z] | [A-Z] | [0-9] | '_')*;
-CADEIA: '"' (~('\n' | '\r' | '"'))* '"';
+IDENT: [a-zA-Z][a-zA-Z0-9_]*;
+CADEIA: '"' CADEIA_FRAGMENT* '"';
+fragment
+CADEIA_FRAGMENT: ~[\n\r"];
 
 /* Skippable Tokens */
-COMENTARIO: '{' (~('}' | '\n' | '\r'))* '}' -> skip;
-WS: (' ' | '\t' | '\r' | '\n') -> skip;
+COMENTARIO: '{' COMENT_FRAGMENT+ '}' -> skip;
+WS: [ \t\r\n]+ -> skip;
+fragment
+COMENT_FRAGMENT: ~[}\n\r];
 
 /* Operators */
 OP_ARIT: '+' | '-' | '*' | '/' | '%';
