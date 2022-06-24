@@ -65,7 +65,7 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	outFile, err := os.OpenFile(outFname, os.O_CREATE|os.O_RDWR, 0766)
+	outFile, err := os.OpenFile(outFname, os.O_CREATE|os.O_RDWR, 0666)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
