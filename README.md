@@ -17,6 +17,10 @@ version of each dependency.
 - Antlr4 (>= 4.10.1)
 - GNU make
 
+### Optional Dependencies
+- docker
+- docker-compose
+
 ## Build
 To build the executable simply run make.
 ```bash
@@ -27,6 +31,13 @@ With the name *EXECNAME*-*VERSION*, where EXECNAME is variable that can be set
 during the build stage, e.g.:
 ```bash
 EXECNAME=<exec_name> make
+```
+
+It may be easier to build it using docker in case antlr executables are not
+linked correctly on the system, building it like that can be done using the
+`build/docker` target:
+```
+make build/docker
 ```
 
 ## How to Run
