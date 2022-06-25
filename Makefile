@@ -7,7 +7,8 @@ EXECNAME ?= LALexer
 PACKAGEPREFIX = pkg
 
 ANTLRPREFIX = antlr
-ANTLR = antlr4
+ANTLR ?= antlr4
+DOCKER_IMAGE_NAME = la-builder
 
 all: build
 
@@ -18,6 +19,13 @@ clean:
 build: grammar
 	@echo "Building executables"
 	${GOCC} build -o ${BUILDDIR}/${EXECNAME}-${VERSION}
+
+build/docker:
+	@echo "Building executables in docker"
+	docker build -t ${DOCKER_IMAGE_NAME} ./docker
+	docker-compose -f ./docker/docker-compose.yml run \
+		-w /la-build la-builder make
+
 
 grammar: ${ANTLRPREFIX}/LA.g4
 	@echo "Generating grammar files"
