@@ -19,6 +19,7 @@ version of each dependency.
 
 ### Optional Dependencies
 - docker
+- docker-compose
 
 ## Build
 To build the executable simply run make.
