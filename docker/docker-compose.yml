@@ -1,0 +1,7 @@
+version: '3.7'
+services:
+  la-builder:
+    image: la-builder
+    build: .
+    volumes:
+      - ./..:/la-build
