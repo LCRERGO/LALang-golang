@@ -36,8 +36,22 @@ EXECNAME=<exec_name> make
 It may be easier to build it using docker in case antlr executables are not
 linked correctly on the system, building it like that can be done using the
 `build/docker` target:
-```
+```bash
 make build/docker
+```
+
+## Test
+To execute the tests simply run the test rule on the Makefile:
+```bash
+make test
+```
+
+After that the results will be located on a directory named test-results in the
+same directory.
+
+It is also possible to execute it the tests inside a docker container:
+```bash
+make test/docker
 ```
 
 ## How to Run
