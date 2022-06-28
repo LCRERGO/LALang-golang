@@ -9,7 +9,7 @@ import (
 )
 
 // Recognizes each token in a specific way and writes them to out file
-func LexerTreatment(lex *grammar.LA, outFile *os.File) {
+func LexerTreatment(lex *grammar.LALexer, outFile *os.File) {
 	// A defered routine to panic at errors and stop parsing symbols
 	defer func(outFile *os.File) {
 		if err := recover(); err != nil {
@@ -23,21 +23,21 @@ func LexerTreatment(lex *grammar.LA, outFile *os.File) {
 		tokenType := t.GetTokenType()
 
 		switch tokenType {
-		case grammar.LAPALAVRA_CHAVE,
-			grammar.LAVIRGULA,
-			grammar.LAABREPARENTESES,
-			grammar.LAFECHAPARENTESES,
-			grammar.LADELIM,
-			grammar.LAOP_ARIT,
-			grammar.LAOP_PON,
-			grammar.LAOP_REL,
-			grammar.LAATRIB:
+		case grammar.LALexerPALAVRA_CHAVE,
+			grammar.LALexerVIRGULA,
+			grammar.LALexerABREPARENTESES,
+			grammar.LALexerFECHAPARENTESES,
+			grammar.LALexerDELIM,
+			grammar.LALexerOP_ARIT,
+			grammar.LALexerOP_PON,
+			grammar.LALexerOP_REL,
+			grammar.LALexerATRIB:
 			// return output string on format <'match','match'> e.g.: <'algoritmo','algoritmo'>
 			outstr = fmt.Sprintf("<'%s','%s'>\n", t.GetText(), t.GetText())
-		case grammar.LACADEIA,
-			grammar.LAIDENT,
-			grammar.LANUM_INT,
-			grammar.LANUM_REAL:
+		case grammar.LALexerCADEIA,
+			grammar.LALexerIDENT,
+			grammar.LALexerNUM_INT,
+			grammar.LALexerNUM_REAL:
 			// return output string on format <'match',token> e.g.: <'idade',IDENT>
 			outstr = fmt.Sprintf("<'%s',%s>\n", t.GetText(), lex.SymbolicNames[t.GetTokenType()])
 		default:

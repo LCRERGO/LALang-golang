@@ -33,7 +33,7 @@ func main() {
 	}
 
 	// Creating a nil lexer
-	lex := grammar.NewLA(cs)
+	lex := grammar.NewLALexer(cs)
 	// Enabling Custom Error Handling
 	lexerErrors := errors.NewLAErrorListener()
 	lex.RemoveErrorListeners()
