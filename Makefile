@@ -39,7 +39,7 @@ test: build
 		./${TESTSDIR} \
 		${TESTPREFIX}/test-cases \
 		"754757" \
-		"t1"
+		"t2"
 
 test/docker: build/docker
 	@echo "Testing executables in docker"
@@ -52,7 +52,7 @@ test/docker: build/docker
 		/tmp/la-build/${TESTSDIR} \
 		${TESTPREFIX}/test-cases \
 		"754757" \
-		"t1"
+		"t2"
 
 grammar: ${ANTLRPREFIX}/LA.g4
 	@echo "Generating grammar files"

@@ -56,11 +56,11 @@ variavel:
 identificador:
     IDENT ('.' IDENT)* dimensao;
 dimensao:
-    ('[' exp_aritmetica ']');
+    ('[' exp_aritmetica ']')*;
 tipo:
     registro | tipo_estendido;
 tipo_basico:
-    'literal' | 'inteiro' | 'real' | 'logico'; 
+    'literal' | 'inteiro' | 'real' | 'logico';
 tipo_basico_ident:
     tipo_basico | IDENT;
 tipo_estendido:
@@ -68,7 +68,7 @@ tipo_estendido:
 valor_constante:
     CADEIA | NUM_INT | NUM_REAL | 'verdadeiro' | 'falso';
 registro:
-    'registro' (variavel)* 'fim_registro';
+    'registro' variavel* 'fim_registro';
 declaracao_global: 
     'procedimento' IDENT '(' parametros? ')' declaracao_local* cmd* 'fim_procedimento' |
     'funcao' IDENT '(' parametros? ')' ':' tipo_estendido declaracao_local* cmd* 'fim_funcao';
@@ -79,26 +79,26 @@ parametros:
 corpo:
     declaracao_local* cmd*;
 cmd:
-    cmdLeia |
-    cmdEscreva | 
-    cmdSe |
-    cmdCaso | 
-    cmdPara |
-    cmdEnquanto |
-    cmdFaca |
-    cmdAtribuicao | 
-    cmdChamada |
+    cmdLeia       |
+    cmdEscreva    |
+    cmdSe         |
+    cmdCaso       |
+    cmdPara       |
+    cmdEnquanto   |
+    cmdFaca       |
+    cmdAtribuicao |
+    cmdChamada    |
     cmdRetorne;
 cmdLeia:
     'leia' '(' '^'? identificador (',' '^'? identificador)* ')';
 cmdEscreva:
     'escreva' '(' expressao (',' expressao)* ')';
 cmdSe:
-    'se' expressao 'entao' cmd* ('senao' cmd*)? 'fim_se';
+    'se'  expressao 'entao' (cmdIf+=cmd)* ('senao' (cmdElse+=cmd)*)? 'fim_se';
 cmdCaso:
     'caso' exp_aritmetica 'seja' selecao ('senao' cmd*)? 'fim_caso';
 cmdPara:
-    'par' IDENT '<-' exp_aritmetica 'ate' exp_aritmetica 'faca' cmd* 'fim_para';
+    'para' IDENT '<-' exp_aritmetica 'ate' exp_aritmetica 'faca' cmd* 'fim_para';
 cmdEnquanto:
     'enquanto' expressao 'faca' cmd* 'fim_enquanto';
 cmdFaca:
@@ -116,7 +116,8 @@ item_selecao:
 constantes:
     numero_intervalo (',' numero_intervalo)*;
 numero_intervalo:
-    op_unario? NUM_INT ('..' op_unario? NUM_INT)?;
+    (op_unarioPrimeiro=op_unario)? numeroPrimeiro=NUM_INT
+    ('..' (op_unariosSegundo=op_unario)? numeroSegundo=NUM_INT)?;
 op_unario:
     '-';
 exp_aritmetica:
@@ -134,7 +135,7 @@ op3:
 parcela:
     op_unario? parcela_unario | parcela_nao_unario;
 parcela_unario:
-    ('^')? identificador |
+    '^'? identificador |
     IDENT '(' expressao (',' expressao)* ')' |
     NUM_INT |
     NUM_REAL |
@@ -152,7 +153,8 @@ termo_logico:
 fator_logico:
     'nao'? parcela_logica;
 parcela_logica:
-    'verdadeiro' | 'falso' | exp_relacional;
+    ('verdadeiro' | 'falso') |
+    exp_relacional;
 op_logico_1:
     'ou';
 op_logico_2:

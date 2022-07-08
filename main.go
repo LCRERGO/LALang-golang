@@ -3,12 +3,23 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/LCRERGO/LALang/pkg/errors"
 	grammar "github.com/LCRERGO/LALang/pkg/grammar/antlr"
 	"github.com/LCRERGO/LALang/pkg/lexer"
+	"github.com/LCRERGO/LALang/pkg/parser"
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 )
+
+func debugValue() int {
+	debug, err := strconv.Atoi(os.Getenv("DEBUG"))
+	if err != nil {
+		debug = 0
+	}
+
+	return debug
+}
 
 /*
  * The main runner of the task
@@ -31,13 +42,32 @@ func main() {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+	debug := debugValue()
 
-	// Creating a nil lexer
+	// A defered routine to panic at errors and stop parsing symbols
+	defer func(outFile *os.File) {
+		if err := recover(); err != nil {
+			// Type casting a inteface{} into an error
+			outFile.WriteString(fmt.Errorf("%v", err).Error())
+		}
+		os.Exit(1)
+	}(outFile)
+
+	// Creating a new lexer
 	lex := grammar.NewLALexer(cs)
 	// Enabling Custom Error Handling
-	lexerErrors := errors.NewLAErrorListener()
 	lex.RemoveErrorListeners()
-	lex.AddErrorListener(lexerErrors)
+	lex.AddErrorListener(errors.NewLALexerErrorListener())
 
-	lexer.LexerTreatment(lex, outFile)
+	lexer.RunLexer(lex, outFile, debug)
+
+	tokStream := antlr.NewCommonTokenStream(lex, antlr.TokenDefaultChannel)
+
+	// Creating a new Parser
+	par := grammar.NewLAParser(tokStream)
+	// Enabling Custom Error Handling
+	par.RemoveErrorListeners()
+	par.AddErrorListener(errors.NewLASyntaxErrorListener())
+
+	parser.RunParser(par, outFile, debug)
 }
