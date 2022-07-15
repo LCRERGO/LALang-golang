@@ -3,7 +3,7 @@ VERSION = 1.0.0
 GOCC = go
 CC = gcc
 BUILDDIR = build
-EXECNAME ?= LALexer
+EXECNAME ?= LASyntax
 
 PACKAGEPREFIX = pkg
 TESTPREFIX = tests
